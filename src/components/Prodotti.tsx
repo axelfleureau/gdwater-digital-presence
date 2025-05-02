@@ -1,4 +1,6 @@
+
 import { Button } from "@/components/ui/button";
+
 const Prodotti = () => {
   const scrollToContact = () => {
     const contactSection = document.getElementById('contatti');
@@ -8,7 +10,9 @@ const Prodotti = () => {
       });
     }
   };
-  return <section id="prodotti" className="py-20 bg-white">
+
+  return (
+    <section id="prodotti" className="py-20 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gdwater-darkblue mb-4">I nostri prodotti</h2>
@@ -20,13 +24,14 @@ const Prodotti = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           
-          
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="md:w-1/2">
-              <img src="/lovable-uploads/de1c3143-d4f1-44f1-87c2-b91594710c95.png" alt="Dispenser da banco" className="w-full h-auto object-contain rounded-lg shadow-md" />
+              <a href="https://www.gdwater.it/frigogasatore-con-distributore-acqua-a-colonna-h2onda-office" target="_blank" rel="noopener noreferrer">
+                <img src="/lovable-uploads/de1c3143-d4f1-44f1-87c2-b91594710c95.png" alt="Dispenser a colonna" className="w-full h-auto object-contain rounded-lg shadow-md hover:opacity-90 transition-opacity" />
+              </a>
             </div>
             <div className="md:w-1/2 space-y-4">
-              <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser da banco</h3>
+              <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser a colonna</h3>
               <p className="text-gdwater-darkgray">
                 Soluzione salvaspazio perfetta per cucine aziendali, sale riunioni e piccoli uffici.
                 Design moderno che si integra facilmente in qualsiasi ambiente professionale.
@@ -42,15 +47,22 @@ const Prodotti = () => {
                   <span className="text-gdwater-blue mr-2">✓</span> Ideali per spazi ridotti
                 </li>
               </ul>
+              <div>
+                <a href="https://www.gdwater.it/frigogasatore-con-distributore-acqua-a-colonna-h2onda-office" target="_blank" rel="noopener noreferrer" className="text-gdwater-blue hover:underline inline-flex items-center">
+                  Scopri di più <span className="ml-1">→</span>
+                </a>
+              </div>
             </div>
           </div>
           
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="md:w-1/2">
-              <img src="/lovable-uploads/30c16c4a-d469-4e18-80ce-ffe857a17a4a.png" alt="Dispenser industriali" className="w-full h-auto object-contain rounded-lg shadow-md" />
+              <a href="https://www.gdwater.it/frigogasatore-con-distributore-dacqua-a-colonna-h2office" target="_blank" rel="noopener noreferrer">
+                <img src="/lovable-uploads/30c16c4a-d469-4e18-80ce-ffe857a17a4a.png" alt="Dispenser a colonna H2" className="w-full h-auto object-contain rounded-lg shadow-md hover:opacity-90 transition-opacity" />
+              </a>
             </div>
             <div className="md:w-1/2 space-y-4">
-              <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser industriali</h3>
+              <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser a colonna H2</h3>
               <p className="text-gdwater-darkgray">
                 Progettati per ambienti industriali e produttivi con elevate necessità di consumo.
                 Garantiscono efficienza e affidabilità anche in contesti di utilizzo intensivo.
@@ -66,15 +78,22 @@ const Prodotti = () => {
                   <span className="text-gdwater-blue mr-2">✓</span> Configurazioni personalizzabili
                 </li>
               </ul>
+              <div>
+                <a href="https://www.gdwater.it/frigogasatore-con-distributore-dacqua-a-colonna-h2office" target="_blank" rel="noopener noreferrer" className="text-gdwater-blue hover:underline inline-flex items-center">
+                  Scopri di più <span className="ml-1">→</span>
+                </a>
+              </div>
             </div>
           </div>
           
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="md:w-1/2">
-              <img src="/lovable-uploads/48aa6ebc-a760-4612-be37-fa3d3a29dc41.png" alt="Dispenser multifunzione" className="w-full h-auto object-contain rounded-lg shadow-md" />
+              <a href="https://www.gdwater.it/frigogasatore-soprabanco-euros-meccanica-40-80-120" target="_blank" rel="noopener noreferrer">
+                <img src="/lovable-uploads/48aa6ebc-a760-4612-be37-fa3d3a29dc41.png" alt="Dispenser Euros 120" className="w-full h-auto object-contain rounded-lg shadow-md hover:opacity-90 transition-opacity" />
+              </a>
             </div>
             <div className="md:w-1/2 space-y-4">
-              <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser multifunzione</h3>
+              <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser Euros 120</h3>
               <p className="text-gdwater-darkgray">
                 Soluzioni avanzate che combinano diverse opzioni di erogazione in un unico sistema.
                 Ideali per hotel, centri conferenze e spazi aziendali di rappresentanza.
@@ -90,6 +109,11 @@ const Prodotti = () => {
                   <span className="text-gdwater-blue mr-2">✓</span> Opzioni di personalizzazione estetica
                 </li>
               </ul>
+              <div>
+                <a href="https://www.gdwater.it/frigogasatore-soprabanco-euros-meccanica-40-80-120" target="_blank" rel="noopener noreferrer" className="text-gdwater-blue hover:underline inline-flex items-center">
+                  Scopri di più <span className="ml-1">→</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -100,6 +124,8 @@ const Prodotti = () => {
           </Button>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default Prodotti;

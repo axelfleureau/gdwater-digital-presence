@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { Droplet, Atom, Dna, FlaskConical } from "lucide-react";
+import { Droplet, Atom, Dna, FlaskConical, Beaker } from "lucide-react";
 
 const TechSection = () => {
   const techFeatures = [
@@ -15,7 +15,7 @@ const TechSection = () => {
       description: "Affinatori progettati da zero per elevare l'acqua potabile ad un livello superiore."
     },
     {
-      icon: <FlaskConical className="h-10 w-10 text-gdwater-blue" />,
+      icon: <Beaker className="h-10 w-10 text-gdwater-blue" />,
       title: "Trattamenti selettivi",
       description: "Purifichiamo le acque su esigenze specifiche come rimuoverne la durezza o nitrati e arsenico."
     },
@@ -40,6 +40,22 @@ const TechSection = () => {
             Da oltre trent'anni sviluppiamo soluzioni innovative per il trattamento dell'acqua,
             combinando esperienza, ricerca e tecnologie all'avanguardia.
           </p>
+        </div>
+        
+        {/* Counter row - optimized for mobile */}
+        <div className="grid grid-cols-3 gap-2 md:gap-8 mb-16 text-center">
+          <div className="flex flex-col items-center">
+            <span className="text-3xl md:text-5xl font-bold text-gdwater-blue mb-2">30+</span>
+            <span className="text-xs md:text-sm text-gdwater-darkgray">Anni di<br className="md:hidden" /> esperienza</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-3xl md:text-5xl font-bold text-gdwater-blue mb-2">500+</span>
+            <span className="text-xs md:text-sm text-gdwater-darkgray">Clienti<br className="md:hidden" /> soddisfatti</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-3xl md:text-5xl font-bold text-gdwater-blue mb-2">1000+</span>
+            <span className="text-xs md:text-sm text-gdwater-darkgray">Installazioni<br className="md:hidden" /> completate</span>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
