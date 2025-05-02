@@ -1,16 +1,14 @@
-
 import { Button } from "@/components/ui/button";
-
 const Prodotti = () => {
   const scrollToContact = () => {
     const contactSection = document.getElementById('contatti');
     if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
+      contactSection.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <section id="prodotti" className="py-20 bg-white">
+  return <section id="prodotti" className="py-20 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gdwater-darkblue mb-4">I nostri prodotti</h2>
@@ -21,41 +19,11 @@ const Prodotti = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="flex flex-col md:flex-row gap-6 items-center">
-            <div className="md:w-1/2">
-              <img 
-                src="/lovable-uploads/64422d28-970f-4f00-908c-b37b7f69df8c.png" 
-                alt="Dispenser da pavimento" 
-                className="w-full h-auto object-contain rounded-lg shadow-md" 
-              />
-            </div>
-            <div className="md:w-1/2 space-y-4">
-              <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser da pavimento</h3>
-              <p className="text-gdwater-darkgray">
-                Ideali per aree comuni aziendali e spazi con alto traffico. Offrono grande capacità
-                e versatilità di erogazione per soddisfare le esigenze di uffici, sale d'attesa e mense.
-              </p>
-              <ul className="space-y-2 text-gdwater-darkgray">
-                <li className="flex items-center">
-                  <span className="text-gdwater-blue mr-2">✓</span> Opzioni di acqua fredda, ambiente e frizzante
-                </li>
-                <li className="flex items-center">
-                  <span className="text-gdwater-blue mr-2">✓</span> Design elegante e compatto
-                </li>
-                <li className="flex items-center">
-                  <span className="text-gdwater-blue mr-2">✓</span> Tecnologia touch o meccanica
-                </li>
-              </ul>
-            </div>
-          </div>
+          
           
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="md:w-1/2">
-              <img 
-                src="/lovable-uploads/de1c3143-d4f1-44f1-87c2-b91594710c95.png" 
-                alt="Dispenser da banco" 
-                className="w-full h-auto object-contain rounded-lg shadow-md" 
-              />
+              <img src="/lovable-uploads/de1c3143-d4f1-44f1-87c2-b91594710c95.png" alt="Dispenser da banco" className="w-full h-auto object-contain rounded-lg shadow-md" />
             </div>
             <div className="md:w-1/2 space-y-4">
               <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser da banco</h3>
@@ -79,11 +47,7 @@ const Prodotti = () => {
           
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="md:w-1/2">
-              <img 
-                src="/lovable-uploads/30c16c4a-d469-4e18-80ce-ffe857a17a4a.png" 
-                alt="Dispenser industriali" 
-                className="w-full h-auto object-contain rounded-lg shadow-md" 
-              />
+              <img src="/lovable-uploads/30c16c4a-d469-4e18-80ce-ffe857a17a4a.png" alt="Dispenser industriali" className="w-full h-auto object-contain rounded-lg shadow-md" />
             </div>
             <div className="md:w-1/2 space-y-4">
               <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser industriali</h3>
@@ -107,11 +71,7 @@ const Prodotti = () => {
           
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="md:w-1/2">
-              <img 
-                src="/lovable-uploads/48aa6ebc-a760-4612-be37-fa3d3a29dc41.png" 
-                alt="Dispenser multifunzione" 
-                className="w-full h-auto object-contain rounded-lg shadow-md" 
-              />
+              <img src="/lovable-uploads/48aa6ebc-a760-4612-be37-fa3d3a29dc41.png" alt="Dispenser multifunzione" className="w-full h-auto object-contain rounded-lg shadow-md" />
             </div>
             <div className="md:w-1/2 space-y-4">
               <h3 className="text-2xl font-bold text-gdwater-darkblue">Dispenser multifunzione</h3>
@@ -135,16 +95,11 @@ const Prodotti = () => {
         </div>
         
         <div className="mt-16 text-center">
-          <Button 
-            onClick={scrollToContact}
-            className="bg-gdwater-blue hover:bg-gdwater-darkblue text-white px-8 py-6 text-lg"
-          >
+          <Button onClick={scrollToContact} className="bg-gdwater-blue hover:bg-gdwater-darkblue text-white px-8 py-6 text-lg">
             Richiedi un preventivo
           </Button>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Prodotti;
