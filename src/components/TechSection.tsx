@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { Flask, Droplet, Atom, Dna, FlaskConical } from "lucide-react";
+import { Droplet, Atom, Dna, FlaskConical } from "lucide-react";
 
 const TechSection = () => {
   const techFeatures = [
@@ -10,7 +10,7 @@ const TechSection = () => {
       description: "Rendiamo l'elemento base della nostra vita ancora migliore, che sia liscia, frizzante, fredda o calda."
     },
     {
-      icon: <Flask className="h-10 w-10 text-gdwater-blue" />,
+      icon: <FlaskConical className="h-10 w-10 text-gdwater-blue" />,
       title: "Refiner allo stato dell'arte",
       description: "Affinatori progettati da zero per elevare l'acqua potabile ad un livello superiore."
     },
