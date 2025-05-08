@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
-import DynamicGreeting from "./DynamicGreeting";
 
 const Hero = () => {
   const scrollToSection = (section: string) => {
@@ -15,13 +14,12 @@ const Hero = () => {
     <section className="relative min-h-screen flex flex-col justify-center bg-gradient-to-br from-white to-gdwater-gray pt-20 pb-10">
       <div className="container mx-auto px-4 md:px-6 lg:px-8 flex flex-col lg:flex-row items-center">
         <div className="lg:w-1/2 text-left space-y-6 animate-fade-in lg:pr-12">
-          <DynamicGreeting />
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gdwater-darkblue leading-tight">
             L'acqua perfetta per la tua azienda
           </h1>
           <p className="text-lg md:text-xl text-gdwater-darkgray max-w-xl">
             GD Water fornisce soluzioni professionali per l'erogazione dell'acqua in ambienti aziendali, 
-            con dispenser di alta qualità Made in Italy, assistenza dedicata e attenzione alla sostenibilità.
+            con erogatori d'acqua di alta qualità Made in Italy, assistenza dedicata e attenzione alla sostenibilità.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Button 
@@ -43,8 +41,8 @@ const Hero = () => {
         </div>
         <div className="lg:w-1/2 mt-10 lg:mt-0 flex justify-center">
           <img 
-            src="/lovable-uploads/2efd93ba-12c9-4654-9f34-42831962ba86.png" 
-            alt="GD Water - Dispenser professionale" 
+            src="/lovable-uploads/9c585076-0a67-4bc0-af6f-71e8cc8d6810.png" 
+            alt="GD Water - H2 Office" 
             className="max-h-[500px] object-contain rounded-lg shadow-lg animate-scale-in" 
           />
         </div>

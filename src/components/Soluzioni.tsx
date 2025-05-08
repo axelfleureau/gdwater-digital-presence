@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 const Soluzioni = () => {
   const soluzioni = [{
     icon: "💧",
-    title: "Acqua filtrata",
+    title: "Acqua microfiltrata",
     description: "Sistemi di filtrazione avanzati per un'acqua pura e cristallina direttamente al punto di utilizzo."
   }, {
     icon: "❄️",
@@ -17,7 +17,7 @@ const Soluzioni = () => {
   }, {
     icon: "✨",
     title: "Acqua frizzante",
-    description: "Sistemi di carbonatazione integrati per un'acqua frizzante di qualità superiore."
+    description: "Acqua frizzante di qualità superiore."
   }];
   
   return (
@@ -41,25 +41,19 @@ const Soluzioni = () => {
         </div>
         
         <div className="mt-16 text-center">
-          <h3 className="text-2xl font-bold text-gdwater-blue mb-6">Porta il cambiamento nella tua azienda</h3>
+          <h3 className="text-2xl font-bold text-gdwater-blue mb-6">Modelli per ogni esigenza</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-4 rounded-lg shadow-lg transition-transform hover:scale-105">
-              <a href="https://www.gdwater.it/prodotti/" target="_blank" rel="noopener noreferrer">
-                <img src="/lovable-uploads/ced391e3-6882-4ae5-a56f-5b325e1281f9.png" alt="Dispenser a colonna" className="w-full h-64 object-contain mb-4" />
-                <h4 className="text-xl font-bold text-gdwater-darkblue">Dispenser a colonna</h4>
-              </a>
+              <img src="/lovable-uploads/9c585076-0a67-4bc0-af6f-71e8cc8d6810.png" alt="H2 Office" className="w-full h-64 object-contain mb-4" />
+              <h4 className="text-xl font-bold text-gdwater-darkblue">H2 Office</h4>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-lg transition-transform hover:scale-105">
-              <a href="https://www.gdwater.it/prodotti/" target="_blank" rel="noopener noreferrer">
-                <img alt="Dispenser da banco" className="w-full h-64 object-contain mb-4" src="/lovable-uploads/25ead14b-3d1c-4bce-9e1e-d39dee3ba225.png" />
-                <h4 className="text-xl font-bold text-gdwater-darkblue">Dispenser a colonna H2</h4>
-              </a>
+              <img src="/lovable-uploads/7d235a7d-2511-4f95-8758-4007a48082b0.png" alt="Euros 150" className="w-full h-64 object-contain mb-4" />
+              <h4 className="text-xl font-bold text-gdwater-darkblue">Euros 150</h4>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-lg transition-transform hover:scale-105">
-              <a href="https://www.gdwater.it/prodotti/" target="_blank" rel="noopener noreferrer">
-                <img src="/lovable-uploads/1d7f7f38-af5b-4d32-8bba-b407616d66b0.png" alt="Dispenser industriale" className="w-full h-64 object-contain mb-4" />
-                <h4 className="text-xl font-bold text-gdwater-darkblue">Dispenser euros 120</h4>
-              </a>
+              <img src="/lovable-uploads/21caac72-3e30-4513-8d4f-50b4a39bd843.png" alt="Euros 150" className="w-full h-64 object-contain mb-4" />
+              <h4 className="text-xl font-bold text-gdwater-darkblue">Euros 150</h4>
             </div>
           </div>
         </div>

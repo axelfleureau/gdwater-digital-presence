@@ -41,14 +41,11 @@ const CookieBanner = () => {
           </p>
           
           <div className="mb-4">
-            <a 
-              href="https://www.gdwater.it/privacy-policy/" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <button 
               className="text-sm text-gdwater-blue hover:underline"
             >
               Leggi le nostre policy
-            </a>
+            </button>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-end">

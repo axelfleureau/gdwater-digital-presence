@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Mail, Phone, MapPin } from "lucide-react";
+
 const ContactForm = () => {
   const [formData, setFormData] = useState({
     nome: "",
@@ -15,12 +17,11 @@ const ContactForm = () => {
     messaggio: "",
     privacy: false
   });
+  
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -29,14 +30,13 @@ const ContactForm = () => {
     // Clear error for the field being edited
     if (errors[name]) {
       setErrors(prev => {
-        const newErrors = {
-          ...prev
-        };
+        const newErrors = { ...prev };
         delete newErrors[name];
         return newErrors;
       });
     }
   };
+
   const handleCheckboxChange = (checked: boolean) => {
     setFormData(prev => ({
       ...prev,
@@ -46,24 +46,27 @@ const ContactForm = () => {
     // Clear privacy error when checking the box
     if (errors.privacy && checked) {
       setErrors(prev => {
-        const newErrors = {
-          ...prev
-        };
+        const newErrors = { ...prev };
         delete newErrors.privacy;
         return newErrors;
       });
     }
   };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+    
     if (!formData.nome.trim()) newErrors.nome = "Campo obbligatorio";
     if (!formData.cellulare.trim()) newErrors.cellulare = "Campo obbligatorio";
-    if (!formData.email.trim()) newErrors.email = "Campo obbligatorio";else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email non valida";
+    if (!formData.email.trim()) newErrors.email = "Campo obbligatorio";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email non valida";
     if (!formData.localita.trim()) newErrors.localita = "Campo obbligatorio";
     if (!formData.privacy) newErrors.privacy = "Devi accettare la privacy policy";
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateForm()) {
@@ -82,7 +85,9 @@ const ContactForm = () => {
       });
     }
   };
-  return <section id="contatti" className="py-20 bg-gdwater-gray">
+
+  return (
+    <section id="contatti" className="py-20 bg-gdwater-gray">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gdwater-darkblue mb-4">Contattaci</h2>
@@ -98,7 +103,7 @@ const ContactForm = () => {
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="nome">Nominativo *</Label>
+                <Label htmlFor="nome">Nome e cognome *</Label>
                 <Input id="nome" name="nome" value={formData.nome} onChange={handleChange} className={errors.nome ? "border-red-500" : ""} />
                 {errors.nome && <p className="text-red-500 text-sm">{errors.nome}</p>}
               </div>
@@ -157,7 +162,7 @@ const ContactForm = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gdwater-darkgray">Telefono</p>
-                    <p className="text-lg font-medium">0431 1938144</p>
+                    <p className="text-lg font-medium">349/3835747</p>
                   </div>
                 </div>
                 
@@ -185,7 +190,7 @@ const ContactForm = () => {
             </div>
             
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="text-xl font-bold text-gdwater-darkblue mb-4">Perché scegliere i nostri dispenser?</h3>
+              <h3 className="text-xl font-bold text-gdwater-darkblue mb-4">Perché scegliere i nostri erogatori d'acqua?</h3>
               
               <ul className="space-y-4">
                 <li className="flex items-start">
@@ -202,7 +207,7 @@ const ContactForm = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-gdwater-blue mr-2 mt-1">✓</span>
-                  <span>Assistenza tecnica e manutenzione programmata</span>
+                  <span>Assistenza tecnica dedicata</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-gdwater-blue mr-2 mt-1">✓</span>
@@ -213,6 +218,8 @@ const ContactForm = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default ContactForm;

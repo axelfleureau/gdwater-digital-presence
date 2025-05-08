@@ -2,7 +2,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Soluzioni from "@/components/Soluzioni";
-import TechSection from "@/components/TechSection";
 import TrustBar from "@/components/TrustBar";
 import Certificazioni from "@/components/Certificazioni";
 import Vantaggi from "@/components/Vantaggi";
@@ -69,7 +68,6 @@ const Index = () => {
       <Hero />
       <TrustBar />
       <Soluzioni />
-      <TechSection />
       <Vantaggi />
       <Prodotti />
       <Certificazioni />

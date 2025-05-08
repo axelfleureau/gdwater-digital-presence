@@ -9,13 +9,13 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <a href="https://www.gdwater.it/" target="_blank" rel="noopener noreferrer" className="flex items-center mb-4">
+            <div className="flex items-center mb-4">
               <img 
-                src="/lovable-uploads/d7146e41-4119-428f-af6d-fd42ee9ff09a.png" 
+                src="/lovable-uploads/089a1f06-09c7-468e-b631-f5c03ea80549.png" 
                 alt="GD Water Logo" 
                 className="h-10 mr-2"
               />
-            </a>
+            </div>
             <p className="text-gray-300">
               Soluzioni professionali per l'erogazione dell'acqua in ambienti aziendali.
               Qualità, sostenibilità e innovazione Made in Italy.
@@ -30,11 +30,10 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">Prodotti</h3>
             <ul className="space-y-2">
-              <li><a href="https://www.gdwater.it/prodotti/" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Dispenser a colonna</a></li>
-              <li><a href="https://www.gdwater.it/prodotti/" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Dispenser da banco</a></li>
-              <li><a href="https://www.gdwater.it/prodotti/" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Dispenser industriali</a></li>
-              <li><a href="https://www.gdwater.it/prodotti/" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Sistemi di filtrazione</a></li>
-              <li><a href="https://www.gdwater.it/prodotti/" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Accessori</a></li>
+              <li><a className="text-gray-300 hover:text-white transition-colors">H2 Office</a></li>
+              <li><a className="text-gray-300 hover:text-white transition-colors">Euros 150</a></li>
+              <li><a className="text-gray-300 hover:text-white transition-colors">Euros 120</a></li>
+              <li><a className="text-gray-300 hover:text-white transition-colors">Euros 80</a></li>
             </ul>
           </div>
           
@@ -42,17 +41,16 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-4">Link utili</h3>
             <ul className="space-y-2">
               <li><a href="#soluzioni" className="text-gray-300 hover:text-white transition-colors">Le nostre soluzioni</a></li>
-              <li><a href="#tecnologia" className="text-gray-300 hover:text-white transition-colors">La nostra tecnologia</a></li>
               <li><a href="#vantaggi" className="text-gray-300 hover:text-white transition-colors">Vantaggi</a></li>
               <li><a href="#prodotti" className="text-gray-300 hover:text-white transition-colors">Prodotti</a></li>
               <li><a href="#contatti" className="text-gray-300 hover:text-white transition-colors">Contattaci</a></li>
               <li className="flex items-center">
                 <Shield className="h-4 w-4 mr-2 text-gdwater-lightblue" />
-                <a href="https://www.gdwater.it/privacy-policy/" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                <a className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a>
               </li>
               <li className="flex items-center">
                 <Cookie className="h-4 w-4 mr-2 text-gdwater-lightblue" />
-                <a href="https://www.gdwater.it/cookie-policy/" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Cookie Policy</a>
+                <a className="text-gray-300 hover:text-white transition-colors">Cookie Policy</a>
               </li>
             </ul>
           </div>
@@ -62,7 +60,7 @@ const Footer = () => {
             <div className="space-y-4">
               <div className="flex items-center">
                 <Phone className="h-5 w-5 mr-3 text-gdwater-lightblue" />
-                <a href="tel:+390431938144" className="hover:text-gdwater-lightblue transition-colors">0431 1938144</a>
+                <a href="tel:+393493835747" className="hover:text-gdwater-lightblue transition-colors">349/3835747</a>
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 mr-3 text-gdwater-lightblue" />
