@@ -34,7 +34,7 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-8 text-gdwater-darkblue">
           <a href="#soluzioni" className="hover:text-gdwater-blue transition-colors py-2">Soluzioni</a>
-          <a href="#tecnologia" className="hover:text-gdwater-blue transition-colors py-2">Tecnologi</a>
+          
           <a href="#vantaggi" className="hover:text-gdwater-blue transition-colors py-2">Vantaggi</a>
           <a href="#prodotti" className="hover:text-gdwater-blue transition-colors py-2">Prodotti</a>
           <a href="#contatti" className="hover:text-gdwater-blue transition-colors py-2">Contattaci</a>
