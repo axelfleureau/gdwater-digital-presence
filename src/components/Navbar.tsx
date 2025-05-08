@@ -1,9 +1,13 @@
+
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -23,18 +27,18 @@ const Navbar = () => {
       document.body.style.overflow = 'auto';
     };
   }, [isMobileMenuOpen]);
+  
   return <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}>
       <div className="container mx-auto flex justify-between items-center px-4 md:px-6">
         <div className="flex items-center">
-          <a href="https://www.gdwater.it/" target="_blank" rel="noopener noreferrer">
+          <Link to="/">
             <img src="/lovable-uploads/d7146e41-4119-428f-af6d-fd42ee9ff09a.png" alt="GD Water Logo" className="h-10 md:h-12" />
-          </a>
+          </Link>
         </div>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-8 text-gdwater-darkblue">
           <a href="#soluzioni" className="hover:text-gdwater-blue transition-colors py-2">Soluzioni</a>
-          
           <a href="#vantaggi" className="hover:text-gdwater-blue transition-colors py-2">Vantaggi</a>
           <a href="#prodotti" className="hover:text-gdwater-blue transition-colors py-2">Prodotti</a>
           <a href="#contatti" className="hover:text-gdwater-blue transition-colors py-2">Contattaci</a>
@@ -72,11 +76,11 @@ const Navbar = () => {
               </a>
               <div className="mt-6">
                 <Button variant="default" className="bg-gdwater-blue hover:bg-gdwater-darkblue text-white px-6 py-2" onClick={() => {
-              document.getElementById('contatti')?.scrollIntoView({
-                behavior: 'smooth'
-              });
-              setIsMobileMenuOpen(false);
-            }}>
+                  document.getElementById('contatti')?.scrollIntoView({
+                    behavior: 'smooth'
+                  });
+                  setIsMobileMenuOpen(false);
+                }}>
                   Chiedi Informazioni
                 </Button>
               </div>
@@ -85,4 +89,5 @@ const Navbar = () => {
       </div>
     </header>;
 };
+
 export default Navbar;
