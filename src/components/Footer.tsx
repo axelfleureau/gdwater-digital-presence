@@ -1,4 +1,3 @@
-
 import { Mail, Phone, MapPin, Shield, Cookie } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -21,8 +20,8 @@ const Footer = () => {
               Qualità, sostenibilità e innovazione Made in Italy.
             </p>
             <p className="text-gray-300 text-sm mt-4">
-              P.IVA 01924930309<br />
-              REA UD-207738<br />
+              P.IVA 03084660301<br />
+              REA UD-365780<br />
               Cap. Soc. € 100.000 i.v.
             </p>
           </div>
