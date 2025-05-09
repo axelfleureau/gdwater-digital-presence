@@ -3,10 +3,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminLayout from "./components/admin/AdminLayout";
 
 // Inizializzazione di React Query
 const queryClient = new QueryClient();
@@ -35,10 +39,48 @@ const updateMetaTags = () => {
 };
 
 const App = () => {
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   useEffect(() => {
     // Aggiorna i meta tag all'avvio dell'applicazione
     updateMetaTags();
+
+    // Configura il listener per l'autenticazione
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+      setAuthInitialized(true);
+    });
+
+    // Controlla lo stato di autenticazione iniziale
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+      setAuthInitialized(true);
+    });
+
+    // Pulizia alla smontaggio
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+
+  // Elemento di rotta protetta che verifica l'autenticazione
+  const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+    if (!authInitialized) {
+      return <div className="min-h-screen flex items-center justify-center bg-gdwater-gray">
+        <div className="text-center">
+          <div className="spinner h-10 w-10 border-4 border-gdwater-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gdwater-darkgray">Caricamento...</p>
+        </div>
+      </div>;
+    }
+
+    if (!isAuthenticated) {
+      return <Navigate to="/admin" replace />;
+    }
+
+    return children;
+  };
   
   return (
     <QueryClientProvider client={queryClient}>
@@ -48,7 +90,17 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/*" element={
+              <ProtectedRoute>
+                <Routes>
+                  <Route element={<AdminLayout />}>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                  </Route>
+                </Routes>
+              </ProtectedRoute>
+            } />
+            {/* Rotta catch-all per 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

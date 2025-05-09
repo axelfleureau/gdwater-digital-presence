@@ -9,7 +9,72 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      admin_utenti: {
+        Row: {
+          attivo: boolean | null
+          email: string
+          id: string
+          password_hash: string
+          ultimo_accesso: string | null
+          username: string | null
+        }
+        Insert: {
+          attivo?: boolean | null
+          email: string
+          id?: string
+          password_hash: string
+          ultimo_accesso?: string | null
+          username?: string | null
+        }
+        Update: {
+          attivo?: boolean | null
+          email?: string
+          id?: string
+          password_hash?: string
+          ultimo_accesso?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      contatti_clienti: {
+        Row: {
+          cellulare: string
+          consenso_privacy: boolean
+          cookie_policy: boolean
+          created_at: string | null
+          email: string
+          id: string
+          localita: string | null
+          messaggio: string | null
+          nome: string
+          scaricato: boolean | null
+        }
+        Insert: {
+          cellulare: string
+          consenso_privacy: boolean
+          cookie_policy: boolean
+          created_at?: string | null
+          email: string
+          id?: string
+          localita?: string | null
+          messaggio?: string | null
+          nome: string
+          scaricato?: boolean | null
+        }
+        Update: {
+          cellulare?: string
+          consenso_privacy?: boolean
+          cookie_policy?: boolean
+          created_at?: string | null
+          email?: string
+          id?: string
+          localita?: string | null
+          messaggio?: string | null
+          nome?: string
+          scaricato?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
