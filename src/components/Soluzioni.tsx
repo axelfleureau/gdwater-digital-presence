@@ -1,6 +1,4 @@
-
 import { Card } from "@/components/ui/card";
-
 const Soluzioni = () => {
   const soluzioni = [{
     icon: "💧",
@@ -19,9 +17,7 @@ const Soluzioni = () => {
     title: "Acqua frizzante",
     description: "Acqua frizzante di qualità superiore."
   }];
-  
-  return (
-    <section id="soluzioni" className="py-20 bg-white">
+  return <section id="soluzioni" className="py-20 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gdwater-darkblue mb-4">Le nostre soluzioni</h2>
@@ -31,13 +27,11 @@ const Soluzioni = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {soluzioni.map((soluzione, index) => (
-            <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 border border-gdwater-gray hover:border-gdwater-blue">
+          {soluzioni.map((soluzione, index) => <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 border border-gdwater-gray hover:border-gdwater-blue">
               <div className="text-5xl mb-4">{soluzione.icon}</div>
               <h3 className="text-xl font-bold text-gdwater-darkblue mb-2">{soluzione.title}</h3>
               <p className="text-gdwater-darkgray">{soluzione.description}</p>
-            </Card>
-          ))}
+            </Card>)}
         </div>
         
         <div className="mt-16 text-center">
@@ -53,13 +47,11 @@ const Soluzioni = () => {
             </div>
             <div className="bg-white p-4 rounded-lg shadow-lg transition-transform hover:scale-105">
               <img src="/lovable-uploads/21caac72-3e30-4513-8d4f-50b4a39bd843.png" alt="Euros 150" className="w-full h-64 object-contain mb-4" />
-              <h4 className="text-xl font-bold text-gdwater-darkblue">Euros 150</h4>
+              <h4 className="text-xl font-bold text-gdwater-darkblue">Euros 120</h4>
             </div>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Soluzioni;
