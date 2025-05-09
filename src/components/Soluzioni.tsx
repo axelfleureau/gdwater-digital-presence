@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 const Soluzioni = () => {
   const soluzioni = [{

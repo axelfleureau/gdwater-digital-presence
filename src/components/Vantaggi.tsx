@@ -17,15 +17,15 @@ const Vantaggi = () => {
     },
     {
       title: "Made in Italy",
-      description: "I nostri dispenser sono progettati e prodotti in Italia, garantendo eccellenza e affidabilità nel tempo."
+      description: "I nostri erogatori d'acqua sono progettati e prodotti in Italia, garantendo eccellenza e affidabilità nel tempo."
     },
     {
-      title: "Assistenza dedicata",
+      title: "Assistenza tecnica dedicata",
       description: "Servizio tecnico specializzato con interventi tempestivi e manutenzione programmata per garantire sempre la massima efficienza."
     },
     {
-      title: "Soluzioni personalizzate",
-      description: "Offriamo configurazioni su misura per le esigenze specifiche della tua azienda, adattandoci a ogni tipologia di spazio."
+      title: "100+ installatori qualificati",
+      description: "Una rete di professionisti esperti garantisce installazioni accurate e puntuali in tutta Italia."
     }
   ];
 

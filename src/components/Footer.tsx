@@ -45,11 +45,11 @@ const Footer = () => {
               <li><a href="#contatti" className="text-gray-300 hover:text-white transition-colors">Contattaci</a></li>
               <li className="flex items-center">
                 <Shield className="h-4 w-4 mr-2 text-gdwater-lightblue" />
-                <a href="https://www.gdwater.it/privacy-policy" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                <a href="https://www.gdwater.it/privacy-policy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a>
               </li>
               <li className="flex items-center">
                 <Cookie className="h-4 w-4 mr-2 text-gdwater-lightblue" />
-                <a href="https://www.gdwater.it/cookie-policy" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Cookie Policy</a>
+                <a href="https://www.gdwater.it/cookie-policy" className="text-gray-300 hover:text-white transition-colors">Cookie Policy</a>
               </li>
             </ul>
           </div>
