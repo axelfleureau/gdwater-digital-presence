@@ -51,8 +51,8 @@ const TrustBar = () => {
           <div className="hidden md:block h-10 w-px bg-white/30"></div>
           
           <div className="flex items-center">
-            <span className="text-3xl md:text-4xl font-bold mr-2">30+</span>
-            <span className="text-lg">anni di<br/>esperienza</span>
+            <span className="text-3xl md:text-4xl font-bold mr-2">100+</span>
+            <span className="text-lg">installatori<br/>qualificati</span>
           </div>
           
           <div className="hidden md:block h-10 w-px bg-white/30"></div>

@@ -1,8 +1,9 @@
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,17 +45,37 @@ const Navbar = () => {
           <a href="#contatti" className="hover:text-gdwater-blue transition-colors py-2">Contattaci</a>
         </nav>
         
-        {/* Desktop CTA Button */}
-        <a href="#contatti" className="hidden md:inline-flex">
-          <Button variant="default" className="bg-gdwater-blue hover:bg-gdwater-darkblue">
-            Chiedi Informazioni
-          </Button>
-        </a>
+        {/* Desktop CTA Button and Admin Link */}
+        <div className="hidden md:flex items-center space-x-3">
+          <a href="#contatti">
+            <Button variant="default" className="bg-gdwater-blue hover:bg-gdwater-darkblue">
+              Chiedi Informazioni
+            </Button>
+          </a>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to="/admin" className="text-gdwater-darkblue hover:text-gdwater-blue transition-colors p-2">
+                  <UserRound size={20} />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Area riservata</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         
         {/* Mobile Menu Button */}
-        <button className="md:hidden text-gdwater-blue p-2 z-50" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label={isMobileMenuOpen ? "Chiudi menu" : "Apri menu"}>
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="md:hidden flex items-center">
+          <Link to="/admin" className="text-gdwater-darkblue hover:text-gdwater-blue transition-colors p-2 mr-2">
+            <UserRound size={20} />
+          </Link>
+          <button className="text-gdwater-blue p-2 z-50" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label={isMobileMenuOpen ? "Chiudi menu" : "Apri menu"}>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
         
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && <div className="fixed inset-0 bg-white z-40 flex flex-col items-center justify-center">
