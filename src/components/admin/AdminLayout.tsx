@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -13,35 +13,76 @@ const AdminLayout = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate("/admin");
-        return;
+      try {
+        // Verifica autenticazione locale
+        const isLocalAuth = localStorage.getItem('gdwater_admin_auth') === 'true';
+        const localUser = localStorage.getItem('gdwater_admin_user');
+        
+        if (isLocalAuth && localUser) {
+          const userData = JSON.parse(localUser);
+          setAdminName(userData.username || userData.email);
+          setLoading(false);
+          return;
+        }
+        
+        // Ottieni la sessione corrente
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          // Controlla ancora una volta l'auth locale in caso sia cambiata
+          if (localStorage.getItem('gdwater_admin_auth') === 'true') {
+            const localUserRetry = localStorage.getItem('gdwater_admin_user');
+            if (localUserRetry) {
+              const userData = JSON.parse(localUserRetry);
+              setAdminName(userData.username || userData.email);
+              setLoading(false);
+              return;
+            }
+          }
+          
+          navigate("/admin");
+          return;
+        }
+
+        // Verifica se l'utente è un admin attivo
+        const { data, error } = await supabase
+          .from("admin_utenti")
+          .select("username, attivo")
+          .eq("email", session.user.email)
+          .single();
+
+        if (error || !data || !data.attivo) {
+          // Non è un admin attivo, effettua il logout
+          await supabase.auth.signOut();
+          navigate("/admin");
+          toast.error("Non hai i permessi per accedere all'area amministrativa.");
+          return;
+        }
+
+        setAdminName(data.username || session.user.email);
+        setLoading(false);
+      } catch (error) {
+        console.error("Errore durante la verifica dell'autenticazione:", error);
+        // Fallback all'auth locale in caso di errori
+        const isLocalAuth = localStorage.getItem('gdwater_admin_auth') === 'true';
+        const localUser = localStorage.getItem('gdwater_admin_user');
+        
+        if (isLocalAuth && localUser) {
+          const userData = JSON.parse(localUser);
+          setAdminName(userData.username || userData.email);
+          setLoading(false);
+        } else {
+          navigate("/admin");
+        }
       }
-
-      // Verifica se l'utente è un admin
-      const { data, error } = await supabase
-        .from("admin_utenti")
-        .select("username, attivo")
-        .eq("email", session.user.email)
-        .single();
-
-      if (error || !data || !data.attivo) {
-        // Non è un admin attivo, effettua il logout
-        await supabase.auth.signOut();
-        navigate("/admin");
-        toast.error("Non hai i permessi per accedere all'area amministrativa.");
-        return;
-      }
-
-      setAdminName(data.username || session.user.email);
-      setLoading(false);
     };
 
     const authListener = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
-        navigate("/admin");
+        // Controlla se c'è ancora auth locale prima di reindirizzare
+        if (localStorage.getItem('gdwater_admin_auth') !== 'true') {
+          navigate("/admin");
+        }
       }
     });
 
@@ -53,16 +94,26 @@ const AdminLayout = () => {
   }, [navigate]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast.success("Logout effettuato con successo");
-    navigate("/admin");
+    try {
+      setLoading(true);
+      await supabase.auth.signOut();
+      // Rimuovi anche l'autenticazione locale
+      localStorage.removeItem('gdwater_admin_auth');
+      localStorage.removeItem('gdwater_admin_user');
+      toast.success("Logout effettuato con successo");
+      navigate("/admin");
+    } catch (error) {
+      console.error("Errore durante il logout:", error);
+      toast.error("Si è verificato un errore durante il logout.");
+      setLoading(false);
+    }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gdwater-gray">
         <div className="text-center">
-          <div className="spinner h-10 w-10 border-4 border-gdwater-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <Loader2 className="h-10 w-10 text-gdwater-blue animate-spin mx-auto mb-4" />
           <p className="text-gdwater-darkgray">Caricamento...</p>
         </div>
       </div>

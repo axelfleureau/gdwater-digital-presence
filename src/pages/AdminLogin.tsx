@@ -1,19 +1,61 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const navigate = useNavigate();
+
+  // Verifica se l'utente è già autenticato all'avvio
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        // Verifica autenticazione locale
+        const isLocalAuth = localStorage.getItem('gdwater_admin_auth') === 'true';
+        if (isLocalAuth) {
+          navigate("/admin/dashboard");
+          return;
+        }
+
+        // Verifica autenticazione Supabase
+        const { data } = await supabase.auth.getSession();
+
+        if (data.session) {
+          // Verifica se l'utente è un admin attivo
+          const { data: adminData, error: adminError } = await supabase
+            .from("admin_utenti")
+            .select("attivo")
+            .eq("email", data.session.user.email)
+            .single();
+
+          if (!adminError && adminData && adminData.attivo) {
+            // Utente già autenticato e attivo, reindirizza alla dashboard
+            navigate("/admin/dashboard");
+            return;
+          } else {
+            // Logout se non è un admin attivo
+            await supabase.auth.signOut();
+          }
+        }
+      } catch (error) {
+        console.error("Errore durante il controllo della sessione:", error);
+      } finally {
+        setIsCheckingSession(false);
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -64,28 +106,17 @@ const AdminLogin = () => {
   const handleDebugLogin = async () => {
     setIsLoading(true);
     try {
-      // Imposta una sessione anonima per scopi di debug
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: "debug@gdwater.it",
-        password: "debug123456",
-      });
-
-      if (error) {
-        // Se l'autenticazione fallisce, prova a creare l'utente
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: "debug@gdwater.it",
-          password: "debug123456",
-        });
-        
-        if (signUpError) {
-          throw new Error("Impossibile creare o autenticare un utente di debug");
-        }
-      }
+      // Bypass completo dell'autenticazione Supabase
+      // Impostiamo direttamente un flag nel localStorage
+      localStorage.setItem('gdwater_admin_auth', 'true');
+      localStorage.setItem('gdwater_admin_user', JSON.stringify({
+        email: 'admin@gdwater.it',
+        username: 'Admin Debug'
+      }));
       
-      // Accesso diretto senza verifica credenziali
       toast.success("Accesso in modalità debug effettuato!");
       
-      // Assicuriamo che il reindirizzamento avvenga dopo il toast
+      // Reindirizzamento alla dashboard dopo il toast
       setTimeout(() => {
         navigate("/admin/dashboard");
       }, 500);
@@ -101,9 +132,26 @@ const AdminLogin = () => {
     setShowPassword(!showPassword);
   };
 
+  // Mostra un loader durante il controllo della sessione
+  if (isCheckingSession) {
+    return (
+      <div className="min-h-screen bg-gdwater-gray flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8">
+        <Loader2 className="h-8 w-8 text-gdwater-blue animate-spin" />
+        <p className="mt-4 text-gdwater-darkgray">Verifica sessione in corso...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gdwater-gray flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <img
+            src="/lovable-uploads/089a1f06-09c7-468e-b631-f5c03ea80549.png"
+            alt="GD Water Logo"
+            className="h-16 mb-6"
+          />
+        </div>
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gdwater-darkblue">
           Area Amministrativa
         </h2>
@@ -175,7 +223,14 @@ const AdminLogin = () => {
                 className="w-full bg-gdwater-blue hover:bg-gdwater-darkblue text-white"
                 disabled={isLoading}
               >
-                {isLoading ? "Accesso in corso..." : "Accedi"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Accesso in corso...
+                  </>
+                ) : (
+                  "Accedi"
+                )}
               </Button>
               
               {/* Pulsante per accesso debug senza credenziali */}
@@ -186,7 +241,14 @@ const AdminLogin = () => {
                 onClick={handleDebugLogin}
                 disabled={isLoading}
               >
-                Accedi senza credenziali
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Elaborazione...
+                  </>
+                ) : (
+                  "Accedi senza credenziali"
+                )}
               </Button>
             </div>
           </form>

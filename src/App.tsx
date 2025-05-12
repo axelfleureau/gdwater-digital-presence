@@ -39,22 +39,28 @@ const updateMetaTags = () => {
 };
 
 const App = () => {
-  const [authInitialized, setAuthInitialized] = useState(false);
+  const [authInitialized, setAuthInitialized] = useState(true); // Cambiato a true per default
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     // Aggiorna i meta tag all'avvio dell'applicazione
     updateMetaTags();
 
+    // Verifica autenticazione locale
+    const isLocalAuth = localStorage.getItem('gdwater_admin_auth') === 'true';
+    if (isLocalAuth) {
+      setIsAuthenticated(true);
+    }
+
     // Configura il listener per l'autenticazione
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
+      setIsAuthenticated(!!session || isLocalAuth);
       setAuthInitialized(true);
     });
 
     // Controlla lo stato di autenticazione iniziale
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
+      setIsAuthenticated(!!session || isLocalAuth);
       setAuthInitialized(true);
     });
 
@@ -66,6 +72,9 @@ const App = () => {
 
   // Elemento di rotta protetta che verifica l'autenticazione
   const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+    // Verifica sia l'autenticazione Supabase che il flag localStorage
+    const isLocalAuth = localStorage.getItem('gdwater_admin_auth') === 'true';
+    
     if (!authInitialized) {
       return <div className="min-h-screen flex items-center justify-center bg-gdwater-gray">
         <div className="text-center">
@@ -75,7 +84,7 @@ const App = () => {
       </div>;
     }
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !isLocalAuth) {
       return <Navigate to="/admin" replace />;
     }
 
