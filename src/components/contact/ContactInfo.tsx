@@ -13,7 +13,7 @@ const ContactInfo = () => {
           </div>
           <div>
             <p className="text-sm text-gdwater-darkgray">Telefono</p>
-            <p className="text-lg font-medium">0431 193 8144</p>
+            <p className="text-lg font-medium">0431 1938144</p>
           </div>
         </div>
         

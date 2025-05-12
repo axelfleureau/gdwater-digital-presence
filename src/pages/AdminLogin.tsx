@@ -20,6 +20,22 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
+      // Prima verifica se l'utente esiste nel database admin_utenti
+      const { data: adminUser, error: adminError } = await supabase
+        .from("admin_utenti")
+        .select("*")
+        .eq("email", email)
+        .eq("attivo", true)
+        .single();
+
+      if (adminError || !adminUser) {
+        console.error("Errore nel recupero dati admin:", adminError);
+        toast.error("Credenziali non valide o utente non autorizzato.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Ora procedi con l'autenticazione Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -28,24 +44,11 @@ const AdminLogin = () => {
       if (error) {
         console.error("Errore di autenticazione:", error);
         toast.error("Credenziali non valide o utente non autorizzato.");
+        setIsLoading(false);
         return;
       }
 
       if (data.user) {
-        // Verifica se l'utente è nell'elenco degli admin
-        const { data: adminData, error: adminError } = await supabase
-          .from("admin_utenti")
-          .select("attivo")
-          .eq("email", email)
-          .single();
-
-        if (adminError || !adminData || !adminData.attivo) {
-          // Se non è un admin attivo, effettua il logout
-          await supabase.auth.signOut();
-          toast.error("Non hai i permessi per accedere all'area amministrativa.");
-          return;
-        }
-
         toast.success("Accesso effettuato con successo!");
         navigate("/admin/dashboard");
       }
@@ -63,7 +66,10 @@ const AdminLogin = () => {
     try {
       // Accesso diretto senza verifica credenziali
       toast.success("Accesso in modalità debug effettuato!");
-      navigate("/admin/dashboard");
+      // Assicuriamo che il reindirizzamento avvenga dopo il toast
+      setTimeout(() => {
+        navigate("/admin/dashboard");
+      }, 500);
     } catch (error) {
       console.error("Errore durante l'accesso debug:", error);
       toast.error("Si è verificato un errore durante l'accesso debug.");
