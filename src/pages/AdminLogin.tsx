@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -54,6 +55,25 @@ const AdminLogin = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Funzione per il bypass dell'autenticazione (modalità debug)
+  const handleDebugLogin = async () => {
+    setIsLoading(true);
+    try {
+      // Accesso diretto senza verifica credenziali
+      toast.success("Accesso in modalità debug effettuato!");
+      navigate("/admin/dashboard");
+    } catch (error) {
+      console.error("Errore durante l'accesso debug:", error);
+      toast.error("Si è verificato un errore durante l'accesso debug.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -103,7 +123,7 @@ const AdminLogin = () => {
                 <Input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   className="pl-10"
@@ -111,16 +131,37 @@ const AdminLogin = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? 
+                    <EyeOff className="h-5 w-5" aria-label="Nascondi password" /> : 
+                    <Eye className="h-5 w-5" aria-label="Mostra password" />
+                  }
+                </button>
               </div>
             </div>
 
-            <div>
+            <div className="flex flex-col space-y-3">
               <Button
                 type="submit"
                 className="w-full bg-gdwater-blue hover:bg-gdwater-darkblue text-white"
                 disabled={isLoading}
               >
                 {isLoading ? "Accesso in corso..." : "Accedi"}
+              </Button>
+              
+              {/* Pulsante per accesso debug senza credenziali */}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full border-gdwater-blue text-gdwater-blue hover:bg-gdwater-blue/10"
+                onClick={handleDebugLogin}
+                disabled={isLoading}
+              >
+                Accedi senza credenziali
               </Button>
             </div>
           </form>
