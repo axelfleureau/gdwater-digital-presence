@@ -20,22 +20,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      // Prima verifica se l'utente esiste nel database admin_utenti
-      const { data: adminUser, error: adminError } = await supabase
-        .from("admin_utenti")
-        .select("*")
-        .eq("email", email)
-        .eq("attivo", true)
-        .single();
-
-      if (adminError || !adminUser) {
-        console.error("Errore nel recupero dati admin:", adminError);
-        toast.error("Credenziali non valide o utente non autorizzato.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Ora procedi con l'autenticazione Supabase
+      // 1. Prima autentichiamo l'utente con Supabase Auth
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -49,6 +34,21 @@ const AdminLogin = () => {
       }
 
       if (data.user) {
+        // 2. Ora verifichiamo se l'utente è un admin attivo
+        const { data: adminUser, error: adminError } = await supabase
+          .from("admin_utenti")
+          .select("attivo")
+          .eq("email", email)
+          .single();
+
+        if (adminError || !adminUser || !adminUser.attivo) {
+          // Se non è un admin attivo, effettuiamo il logout
+          await supabase.auth.signOut();
+          toast.error("Non hai i permessi per accedere all'area amministrativa.");
+          setIsLoading(false);
+          return;
+        }
+
         toast.success("Accesso effettuato con successo!");
         navigate("/admin/dashboard");
       }
@@ -64,8 +64,27 @@ const AdminLogin = () => {
   const handleDebugLogin = async () => {
     setIsLoading(true);
     try {
+      // Imposta una sessione anonima per scopi di debug
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: "debug@gdwater.it",
+        password: "debug123456",
+      });
+
+      if (error) {
+        // Se l'autenticazione fallisce, prova a creare l'utente
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: "debug@gdwater.it",
+          password: "debug123456",
+        });
+        
+        if (signUpError) {
+          throw new Error("Impossibile creare o autenticare un utente di debug");
+        }
+      }
+      
       // Accesso diretto senza verifica credenziali
       toast.success("Accesso in modalità debug effettuato!");
+      
       // Assicuriamo che il reindirizzamento avvenga dopo il toast
       setTimeout(() => {
         navigate("/admin/dashboard");
