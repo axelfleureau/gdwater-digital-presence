@@ -80,7 +80,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_admin_last_access: {
+        Args: { admin_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

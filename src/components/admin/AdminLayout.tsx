@@ -14,11 +14,14 @@ const AdminLayout = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log("Verifico autenticazione...");
+        
         // Verifica autenticazione locale
         const isLocalAuth = localStorage.getItem('gdwater_admin_auth') === 'true';
         const localUser = localStorage.getItem('gdwater_admin_user');
         
         if (isLocalAuth && localUser) {
+          console.log("Autenticazione locale trovata");
           const userData = JSON.parse(localUser);
           setAdminName(userData.username || userData.email);
           setLoading(false);
@@ -27,6 +30,7 @@ const AdminLayout = () => {
         
         // Ottieni la sessione corrente
         const { data: { session } } = await supabase.auth.getSession();
+        console.log("Sessione Supabase:", session ? "Attiva" : "Non attiva");
         
         if (!session) {
           // Controlla ancora una volta l'auth locale in caso sia cambiata
@@ -49,10 +53,13 @@ const AdminLayout = () => {
           .from("admin_utenti")
           .select("username, attivo")
           .eq("email", session.user.email)
-          .single();
+          .maybeSingle();
+
+        console.log("Risultato verifica admin:", { data, error });
 
         if (error || !data || !data.attivo) {
           // Non è un admin attivo, effettua il logout
+          console.log("Utente non autorizzato o non attivo");
           await supabase.auth.signOut();
           navigate("/admin");
           toast.error("Non hai i permessi per accedere all'area amministrativa.");
@@ -78,6 +85,7 @@ const AdminLayout = () => {
     };
 
     const authListener = supabase.auth.onAuthStateChange((event) => {
+      console.log("Evento auth:", event);
       if (event === "SIGNED_OUT") {
         // Controlla se c'è ancora auth locale prima di reindirizzare
         if (localStorage.getItem('gdwater_admin_auth') !== 'true') {

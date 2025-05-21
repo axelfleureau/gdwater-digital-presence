@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Download, Trash2, Edit, Check, X, Phone, Mail, MapPin, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 interface Contact {
   id: string;
@@ -31,7 +30,6 @@ const ContactsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Contact>>({});
-  const navigate = useNavigate();
 
   // Stato di paginazione
   const [page, setPage] = useState(0);
@@ -62,10 +60,6 @@ const ContactsTable = () => {
     try {
       console.log("Inizio fetchContacts con parametri:", { page, perPage, searchTerm });
       
-      // Verifica se ci sono contatti salvati in localStorage per il fallback
-      const savedContacts = localStorage.getItem('gdwater_contacts');
-      let localContacts = savedContacts ? JSON.parse(savedContacts) : [];
-      
       // Ottieni il conteggio totale
       let countQuery = supabase
         .from('contatti_clienti')
@@ -81,13 +75,12 @@ const ContactsTable = () => {
 
       if (countError) {
         console.error("Errore nel conteggio:", countError);
-        if (localContacts.length > 0) {
-          console.log("Usando contatti dal localStorage come fallback");
-          setContacts(localContacts);
-          setTotal(localContacts.length);
-          setLoading(false);
-          return;
-        }
+        // Fallback al contatto di esempio
+        setContacts([sampleContact]);
+        setTotal(1);
+        toast.error("Errore nel caricamento dei dati, usando contatto di esempio");
+        setLoading(false);
+        return;
       }
 
       setTotal(count || 0);
@@ -102,10 +95,7 @@ const ContactsTable = () => {
         dataQuery = dataQuery.ilike('nome', `%${searchTerm}%`);
       }
       
-      // Se count è 0, non applica il range per evitare errori
-      if (count && count > 0) {
-        dataQuery = dataQuery.range(page * perPage, (page * perPage) + perPage - 1);
-      }
+      dataQuery = dataQuery.range(page * perPage, (page * perPage) + perPage - 1);
 
       const { data, error } = await dataQuery;
 
@@ -113,20 +103,10 @@ const ContactsTable = () => {
 
       if (error) {
         console.error("Errore nel recupero dei contatti:", error);
-        // Fallback ai contatti locali se disponibili
-        if (localContacts.length > 0) {
-          setContacts(localContacts);
-          setTotal(localContacts.length);
-          toast.error("Errore nel caricamento dei dati dal server, usando dati locali");
-        } else {
-          // Fallback al contatto di esempio se non ci sono contatti locali
-          setContacts([sampleContact]);
-          setTotal(1);
-          toast.error("Errore nel caricamento dei dati, usando contatto di esempio");
-          
-          // Salva il contatto di esempio nel localStorage per futuri fallback
-          localStorage.setItem('gdwater_contacts', JSON.stringify([sampleContact]));
-        }
+        // Fallback al contatto di esempio
+        setContacts([sampleContact]);
+        setTotal(1);
+        toast.error("Errore nel caricamento dei dati, usando contatto di esempio");
         return;
       }
 
@@ -134,43 +114,32 @@ const ContactsTable = () => {
       if (!data || data.length === 0) {
         console.log("Nessun contatto trovato nel database");
         
-        // Se ci sono contatti nel localStorage, usali come fallback
-        if (localContacts.length > 0) {
-          console.log("Usando contatti dal localStorage");
-          setContacts(localContacts);
-          setTotal(localContacts.length);
+        // Prova a caricare tutti i contatti senza paginazione per vedere se ci sono dati
+        const { data: allData, error: allError } = await supabase
+          .from('contatti_clienti')
+          .select('*')
+          .limit(10);
+          
+        if (!allError && allData && allData.length > 0) {
+          console.log("Trovati alcuni contatti senza paginazione:", allData.length);
+          setContacts(allData);
+          setTotal(allData.length);
         } else {
-          // Altrimenti usa il contatto di esempio
-          console.log("Usando contatto di esempio");
+          console.log("Nessun contatto trovato, uso contatto di esempio");
           setContacts([sampleContact]);
           setTotal(1);
-          
-          // Salva il contatto di esempio nel localStorage per futuri fallback
-          localStorage.setItem('gdwater_contacts', JSON.stringify([sampleContact]));
+          toast.info("Nessun contatto trovato nel database, visualizzato un contatto di esempio");
         }
       } else {
         console.log("Contatti caricati con successo:", data.length);
         setContacts(data);
-        
-        // Salva i contatti nel localStorage per futuri fallback
-        localStorage.setItem('gdwater_contacts', JSON.stringify(data));
       }
     } catch (error) {
       console.error("Errore imprevisto:", error);
-      
-      // Fallback al localStorage o al contatto di esempio
-      const savedContacts = localStorage.getItem('gdwater_contacts');
-      if (savedContacts) {
-        const localContacts = JSON.parse(savedContacts);
-        setContacts(localContacts);
-        setTotal(localContacts.length);
-        toast.error("Errore imprevisto, usando dati salvati localmente");
-      } else {
-        setContacts([sampleContact]);
-        setTotal(1);
-        toast.error("Errore imprevisto, usando contatto di esempio");
-        localStorage.setItem('gdwater_contacts', JSON.stringify([sampleContact]));
-      }
+      // Fallback al contatto di esempio
+      setContacts([sampleContact]);
+      setTotal(1);
+      toast.error("Errore imprevisto, usando contatto di esempio");
     } finally {
       setLoading(false);
     }
@@ -209,6 +178,12 @@ const ContactsTable = () => {
     }
 
     try {
+      // Verifica se è un contatto di esempio
+      if (id === "sample-1") {
+        toast.info("Non è possibile eliminare il contatto di esempio");
+        return;
+      }
+
       const { error } = await supabase
         .from('contatti_clienti')
         .delete()
@@ -218,14 +193,6 @@ const ContactsTable = () => {
         console.error("Errore nell'eliminazione:", error);
         toast.error("Errore nell'eliminazione del contatto");
         return;
-      }
-
-      // Aggiorna anche lo storage locale
-      const savedContacts = localStorage.getItem('gdwater_contacts');
-      if (savedContacts) {
-        const localContacts = JSON.parse(savedContacts);
-        const updatedContacts = localContacts.filter((contact: Contact) => contact.id !== id);
-        localStorage.setItem('gdwater_contacts', JSON.stringify(updatedContacts));
       }
 
       toast.success("Contatto eliminato con successo");
@@ -248,6 +215,12 @@ const ContactsTable = () => {
     }
 
     try {
+      // Verifica se ci sono contatti di esempio selezionati
+      if (selectedContacts.includes("sample-1")) {
+        toast.info("Non è possibile eliminare il contatto di esempio");
+        return;
+      }
+
       const { error } = await supabase
         .from('contatti_clienti')
         .delete()
@@ -257,14 +230,6 @@ const ContactsTable = () => {
         console.error("Errore nell'eliminazione multipla:", error);
         toast.error("Errore nell'eliminazione dei contatti");
         return;
-      }
-
-      // Aggiorna anche lo storage locale
-      const savedContacts = localStorage.getItem('gdwater_contacts');
-      if (savedContacts) {
-        const localContacts = JSON.parse(savedContacts);
-        const updatedContacts = localContacts.filter((contact: Contact) => !selectedContacts.includes(contact.id));
-        localStorage.setItem('gdwater_contacts', JSON.stringify(updatedContacts));
       }
 
       toast.success(`${selectedContacts.length} contatti eliminati con successo`);
@@ -295,6 +260,14 @@ const ContactsTable = () => {
     if (!editingContact || !editFormData) return;
 
     try {
+      // Verifica se è un contatto di esempio
+      if (editingContact.id === "sample-1") {
+        toast.info("Non è possibile modificare il contatto di esempio");
+        setEditingContact(null);
+        setEditFormData({});
+        return;
+      }
+
       const { error } = await supabase
         .from('contatti_clienti')
         .update(editFormData)
@@ -304,16 +277,6 @@ const ContactsTable = () => {
         console.error("Errore nell'aggiornamento:", error);
         toast.error("Errore nell'aggiornamento del contatto");
         return;
-      }
-
-      // Aggiorna anche lo storage locale
-      const savedContacts = localStorage.getItem('gdwater_contacts');
-      if (savedContacts) {
-        const localContacts = JSON.parse(savedContacts);
-        const updatedContacts = localContacts.map((contact: Contact) => 
-          contact.id === editingContact.id ? {...contact, ...editFormData} : contact
-        );
-        localStorage.setItem('gdwater_contacts', JSON.stringify(updatedContacts));
       }
 
       toast.success("Contatto aggiornato con successo");
@@ -335,7 +298,26 @@ const ContactsTable = () => {
           toast.error("Nessun contatto selezionato per il download");
           return;
         }
-        dataToExport = contacts.filter(contact => selectedContacts.includes(contact.id));
+        
+        // Verifica se ci sono solo contatti di esempio selezionati
+        if (selectedContacts.length === 1 && selectedContacts[0] === "sample-1") {
+          dataToExport = [sampleContact];
+        } else {
+          // Filtra il contatto di esempio e scarica solo i reali
+          const realContactIds = selectedContacts.filter(id => id !== "sample-1");
+          const { data, error } = await supabase
+            .from('contatti_clienti')
+            .select('*')
+            .in('id', realContactIds);
+
+          if (error) {
+            console.error("Errore nel recupero dei contatti selezionati:", error);
+            toast.error("Errore nel caricamento dei dati selezionati");
+            return;
+          }
+          
+          dataToExport = data;
+        }
       } else {
         // Scarica tutti i contatti
         const { data, error } = await supabase
@@ -348,6 +330,9 @@ const ContactsTable = () => {
           // Usa i contatti già caricati come fallback
           dataToExport = contacts;
           toast.warning("Usando i contatti già caricati per il download");
+        } else if (!data || data.length === 0) {
+          // Se non ci sono contatti nel database, usa il contatto di esempio
+          dataToExport = [sampleContact];
         } else {
           dataToExport = data;
         }
@@ -387,34 +372,31 @@ const ContactsTable = () => {
       link.click();
       document.body.removeChild(link);
 
-      // Aggiorna flag "scaricato"
+      // Aggiorna flag "scaricato" per i contatti reali
       if (dataToExport.length > 0) {
-        const idsToUpdate = dataToExport.map(contact => contact.id);
+        // Filtra il contatto di esempio
+        const realContacts = dataToExport.filter(contact => contact.id !== "sample-1");
         
-        const { error } = await supabase
-          .from('contatti_clienti')
-          .update({ scaricato: true })
-          .in('id', idsToUpdate);
+        if (realContacts.length > 0) {
+          const idsToUpdate = realContacts.map(contact => contact.id);
+          
+          const { error } = await supabase
+            .from('contatti_clienti')
+            .update({ scaricato: true })
+            .in('id', idsToUpdate);
 
-        if (error) {
-          console.error("Errore nell'aggiornamento del flag scaricato:", error);
-        } else {
-          // Aggiorna anche i contatti visualizzati
-          setContacts(contacts.map(contact => 
-            idsToUpdate.includes(contact.id) ? {...contact, scaricato: true} : contact
-          ));
-          
-          // Aggiorna anche lo storage locale
-          const savedContacts = localStorage.getItem('gdwater_contacts');
-          if (savedContacts) {
-            const localContacts = JSON.parse(savedContacts);
-            const updatedContacts = localContacts.map((contact: Contact) => 
+          if (error) {
+            console.error("Errore nell'aggiornamento del flag scaricato:", error);
+          } else {
+            // Aggiorna anche i contatti visualizzati
+            setContacts(contacts.map(contact => 
               idsToUpdate.includes(contact.id) ? {...contact, scaricato: true} : contact
-            );
-            localStorage.setItem('gdwater_contacts', JSON.stringify(updatedContacts));
+            ));
+            
+            toast.success(`${idsToUpdate.length} contatti marcati come 'scaricati'`);
           }
-          
-          toast.success(`${dataToExport.length} contatti scaricati e marcati come 'scaricati'`);
+        } else {
+          toast.info("Contatto demo scaricato (nessun aggiornamento nel database)");
         }
       }
     } catch (error) {
