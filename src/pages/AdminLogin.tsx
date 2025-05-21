@@ -29,6 +29,7 @@ const AdminLogin = () => {
 
         // Verifica autenticazione Supabase
         const { data } = await supabase.auth.getSession();
+        console.log("Sessione Supabase:", data.session);
 
         if (data.session) {
           // Verifica se l'utente è un admin attivo
@@ -38,11 +39,14 @@ const AdminLogin = () => {
             .eq("email", data.session.user.email)
             .single();
 
+          console.log("Dati admin:", adminData, "Errore:", adminError);
+
           if (!adminError && adminData && adminData.attivo) {
             // Utente già autenticato e attivo, reindirizza alla dashboard
             navigate("/admin/dashboard");
             return;
           } else {
+            console.log("Utente non attivo o non admin");
             // Logout se non è un admin attivo
             await supabase.auth.signOut();
           }
@@ -62,16 +66,19 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
+      console.log("Tentativo di login con:", email);
+      
       // 1. Prima autentichiamo l'utente con Supabase Auth
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
+      console.log("Risultato autenticazione:", data, "Errore:", error);
+
       if (error) {
         console.error("Errore di autenticazione:", error);
         toast.error("Credenziali non valide o utente non autorizzato.");
-        setIsLoading(false);
         return;
       }
 
@@ -83,11 +90,12 @@ const AdminLogin = () => {
           .eq("email", email)
           .single();
 
+        console.log("Verifica admin:", adminUser, "Errore:", adminError);
+
         if (adminError || !adminUser || !adminUser.attivo) {
           // Se non è un admin attivo, effettuiamo il logout
           await supabase.auth.signOut();
           toast.error("Non hai i permessi per accedere all'area amministrativa.");
-          setIsLoading(false);
           return;
         }
 
