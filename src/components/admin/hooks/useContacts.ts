@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Contact } from "../types/Contact";
@@ -26,7 +26,7 @@ export const useContacts = () => {
   const [perPage, setPerPage] = useState(10);
   const [total, setTotal] = useState(0);
 
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async () => {
     setLoading(true);
 
     try {
@@ -115,11 +115,11 @@ export const useContacts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, perPage, searchTerm]);
 
   useEffect(() => {
     fetchContacts();
-  }, [page, perPage, searchTerm]);
+  }, [fetchContacts]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Sei sicuro di voler eliminare questo contatto?")) {

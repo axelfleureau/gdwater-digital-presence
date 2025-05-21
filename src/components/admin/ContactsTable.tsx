@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Table, TableBody } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,7 @@ import { ContactTableRow } from "./table/ContactTableRow";
 import { TablePagination } from "./table/TablePagination";
 import { EmptyState, LoadingState } from "./table/LoadingState";
 import { useContacts } from "./hooks/useContacts";
+import { supabase } from "@/integrations/supabase/client";
 import { Contact } from "./types/Contact";
 
 const ContactsTable = () => {
@@ -24,7 +24,8 @@ const ContactsTable = () => {
     handleDelete,
     handleDeleteSelected,
     downloadCSV,
-    updateDownloadedFlag
+    updateDownloadedFlag,
+    fetchContacts
   } = useContacts();
 
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
