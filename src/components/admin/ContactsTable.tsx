@@ -1,149 +1,35 @@
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { 
-  Table, TableHeader, TableBody, TableFooter,
-  TableHead, TableRow, TableCell
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Table, TableBody } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Download, Trash2, Edit, Check, X, Phone, Mail, MapPin, Loader2 } from "lucide-react";
-
-interface Contact {
-  id: string;
-  nome: string;
-  cellulare: string;
-  email: string;
-  localita: string;
-  messaggio: string;
-  consenso_privacy: boolean;
-  cookie_policy: boolean;
-  scaricato: boolean;
-  created_at: string;
-}
+import { ContactsTableHeader } from "./table/TableHeader";
+import { TableActions } from "./table/TableActions";
+import { ContactTableRow } from "./table/ContactTableRow";
+import { TablePagination } from "./table/TablePagination";
+import { EmptyState, LoadingState } from "./table/LoadingState";
+import { useContacts } from "./hooks/useContacts";
+import { Contact } from "./types/Contact";
 
 const ContactsTable = () => {
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    contacts,
+    loading,
+    searchTerm,
+    setSearchTerm,
+    page,
+    setPage,
+    perPage,
+    total,
+    handleDelete,
+    handleDeleteSelected,
+    downloadCSV,
+    updateDownloadedFlag
+  } = useContacts();
+
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Contact>>({});
-
-  // Stato di paginazione
-  const [page, setPage] = useState(0);
-  const [perPage, setPerPage] = useState(10);
-  const [total, setTotal] = useState(0);
-
-  // Contatto di esempio per fallback
-  const sampleContact: Contact = {
-    id: "sample-1",
-    nome: "Contatto Demo",
-    cellulare: "0431 1938144",
-    email: "info@gdwater.it",
-    localita: "Udine",
-    messaggio: "Questo è un contatto di esempio per testare l'interfaccia",
-    consenso_privacy: true,
-    cookie_policy: true,
-    scaricato: false,
-    created_at: new Date().toISOString()
-  };
-
-  useEffect(() => {
-    fetchContacts();
-  }, [page, perPage, searchTerm]);
-
-  const fetchContacts = async () => {
-    setLoading(true);
-
-    try {
-      console.log("Inizio fetchContacts con parametri:", { page, perPage, searchTerm });
-      
-      // Ottieni il conteggio totale
-      let countQuery = supabase
-        .from('contatti_clienti')
-        .select('*', { count: 'exact', head: true });
-      
-      if (searchTerm) {
-        countQuery = countQuery.ilike('nome', `%${searchTerm}%`);
-      }
-
-      const { count, error: countError } = await countQuery;
-
-      console.log("Risultato conteggio:", { count, countError });
-
-      if (countError) {
-        console.error("Errore nel conteggio:", countError);
-        // Fallback al contatto di esempio
-        setContacts([sampleContact]);
-        setTotal(1);
-        toast.error("Errore nel caricamento dei dati, usando contatto di esempio");
-        setLoading(false);
-        return;
-      }
-
-      setTotal(count || 0);
-
-      // Ottieni i dati paginati
-      let dataQuery = supabase
-        .from('contatti_clienti')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (searchTerm) {
-        dataQuery = dataQuery.ilike('nome', `%${searchTerm}%`);
-      }
-      
-      dataQuery = dataQuery.range(page * perPage, (page * perPage) + perPage - 1);
-
-      const { data, error } = await dataQuery;
-
-      console.log("Risultato query contatti:", { data, error, count });
-
-      if (error) {
-        console.error("Errore nel recupero dei contatti:", error);
-        // Fallback al contatto di esempio
-        setContacts([sampleContact]);
-        setTotal(1);
-        toast.error("Errore nel caricamento dei dati, usando contatto di esempio");
-        return;
-      }
-
-      // Se non ci sono dati dal database, usa il fallback
-      if (!data || data.length === 0) {
-        console.log("Nessun contatto trovato nel database");
-        
-        // Prova a caricare tutti i contatti senza paginazione per vedere se ci sono dati
-        const { data: allData, error: allError } = await supabase
-          .from('contatti_clienti')
-          .select('*')
-          .limit(10);
-          
-        if (!allError && allData && allData.length > 0) {
-          console.log("Trovati alcuni contatti senza paginazione:", allData.length);
-          setContacts(allData);
-          setTotal(allData.length);
-        } else {
-          console.log("Nessun contatto trovato, uso contatto di esempio");
-          setContacts([sampleContact]);
-          setTotal(1);
-          toast.info("Nessun contatto trovato nel database, visualizzato un contatto di esempio");
-        }
-      } else {
-        console.log("Contatti caricati con successo:", data.length);
-        setContacts(data);
-      }
-    } catch (error) {
-      console.error("Errore imprevisto:", error);
-      // Fallback al contatto di esempio
-      setContacts([sampleContact]);
-      setTotal(1);
-      toast.error("Errore imprevisto, usando contatto di esempio");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -169,75 +55,6 @@ const ContactsTable = () => {
       setSelectedContacts(selectedContacts.filter(contactId => contactId !== id));
     } else {
       setSelectedContacts([...selectedContacts, id]);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo contatto?")) {
-      return;
-    }
-
-    try {
-      // Verifica se è un contatto di esempio
-      if (id === "sample-1") {
-        toast.info("Non è possibile eliminare il contatto di esempio");
-        return;
-      }
-
-      const { error } = await supabase
-        .from('contatti_clienti')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error("Errore nell'eliminazione:", error);
-        toast.error("Errore nell'eliminazione del contatto");
-        return;
-      }
-
-      toast.success("Contatto eliminato con successo");
-      setContacts(contacts.filter(contact => contact.id !== id));
-      setSelectedContacts(selectedContacts.filter(contactId => contactId !== id));
-    } catch (error) {
-      console.error("Errore imprevisto:", error);
-      toast.error("Si è verificato un errore imprevisto");
-    }
-  };
-
-  const handleDeleteSelected = async () => {
-    if (selectedContacts.length === 0) {
-      toast.error("Nessun contatto selezionato");
-      return;
-    }
-
-    if (!window.confirm(`Sei sicuro di voler eliminare ${selectedContacts.length} contatti?`)) {
-      return;
-    }
-
-    try {
-      // Verifica se ci sono contatti di esempio selezionati
-      if (selectedContacts.includes("sample-1")) {
-        toast.info("Non è possibile eliminare il contatto di esempio");
-        return;
-      }
-
-      const { error } = await supabase
-        .from('contatti_clienti')
-        .delete()
-        .in('id', selectedContacts);
-
-      if (error) {
-        console.error("Errore nell'eliminazione multipla:", error);
-        toast.error("Errore nell'eliminazione dei contatti");
-        return;
-      }
-
-      toast.success(`${selectedContacts.length} contatti eliminati con successo`);
-      fetchContacts();
-      setSelectedContacts([]);
-    } catch (error) {
-      console.error("Errore imprevisto:", error);
-      toast.error("Si è verificato un errore imprevisto");
     }
   };
 
@@ -289,119 +106,53 @@ const ContactsTable = () => {
     }
   };
 
-  const downloadCSV = async (selectedOnly: boolean = false) => {
-    try {
-      let dataToExport;
+  const handleDownload = async (selectedOnly: boolean) => {
+    const result = await downloadCSV(selectedOnly, selectedContacts);
+    
+    if (!result) return;
+    
+    const { dataToExport } = result;
 
-      if (selectedOnly) {
-        if (selectedContacts.length === 0) {
-          toast.error("Nessun contatto selezionato per il download");
-          return;
-        }
-        
-        // Verifica se ci sono solo contatti di esempio selezionati
-        if (selectedContacts.length === 1 && selectedContacts[0] === "sample-1") {
-          dataToExport = [sampleContact];
-        } else {
-          // Filtra il contatto di esempio e scarica solo i reali
-          const realContactIds = selectedContacts.filter(id => id !== "sample-1");
-          const { data, error } = await supabase
-            .from('contatti_clienti')
-            .select('*')
-            .in('id', realContactIds);
+    // Crea CSV
+    const headers = ["ID", "Nome", "Cellulare", "Email", "Località", "Messaggio", "Privacy", "Cookie", "Scaricato", "Data creazione"];
+    const csvContent = [
+      headers.join(','),
+      ...dataToExport.map(contact => [
+        contact.id,
+        `"${contact.nome.replace(/"/g, '""')}"`,
+        `"${contact.cellulare.replace(/"/g, '""')}"`,
+        `"${contact.email.replace(/"/g, '""')}"`,
+        `"${contact.localita?.replace(/"/g, '""') || ''}"`,
+        `"${contact.messaggio?.replace(/"/g, '""') || ''}"`,
+        contact.consenso_privacy ? "Sì" : "No",
+        contact.cookie_policy ? "Sì" : "No",
+        contact.scaricato ? "Sì" : "No",
+        formatDate(contact.created_at)
+      ].join(','))
+    ].join('\n');
 
-          if (error) {
-            console.error("Errore nel recupero dei contatti selezionati:", error);
-            toast.error("Errore nel caricamento dei dati selezionati");
-            return;
-          }
-          
-          dataToExport = data;
-        }
+    // Crea blob e link per il download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `contatti_gdwater_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Aggiorna flag "scaricato" per i contatti reali
+    if (dataToExport.length > 0) {
+      // Filtra il contatto di esempio
+      const idsToUpdate = dataToExport.map(contact => contact.id);
+      const updated = await updateDownloadedFlag(idsToUpdate);
+      
+      if (updated) {
+        toast.success(`${idsToUpdate.length} contatti marcati come 'scaricati'`);
       } else {
-        // Scarica tutti i contatti
-        const { data, error } = await supabase
-          .from('contatti_clienti')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error("Errore nel recupero dei contatti:", error);
-          // Usa i contatti già caricati come fallback
-          dataToExport = contacts;
-          toast.warning("Usando i contatti già caricati per il download");
-        } else if (!data || data.length === 0) {
-          // Se non ci sono contatti nel database, usa il contatto di esempio
-          dataToExport = [sampleContact];
-        } else {
-          dataToExport = data;
-        }
+        toast.info("Contatto demo scaricato (nessun aggiornamento nel database)");
       }
-
-      if (!dataToExport || dataToExport.length === 0) {
-        toast.error("Nessun dato da esportare");
-        return;
-      }
-
-      // Crea CSV
-      const headers = ["ID", "Nome", "Cellulare", "Email", "Località", "Messaggio", "Privacy", "Cookie", "Scaricato", "Data creazione"];
-      const csvContent = [
-        headers.join(','),
-        ...dataToExport.map(contact => [
-          contact.id,
-          `"${contact.nome.replace(/"/g, '""')}"`,
-          `"${contact.cellulare.replace(/"/g, '""')}"`,
-          `"${contact.email.replace(/"/g, '""')}"`,
-          `"${contact.localita?.replace(/"/g, '""') || ''}"`,
-          `"${contact.messaggio?.replace(/"/g, '""') || ''}"`,
-          contact.consenso_privacy ? "Sì" : "No",
-          contact.cookie_policy ? "Sì" : "No",
-          contact.scaricato ? "Sì" : "No",
-          formatDate(contact.created_at)
-        ].join(','))
-      ].join('\n');
-
-      // Crea blob e link per il download
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `contatti_gdwater_${new Date().toISOString().slice(0, 10)}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Aggiorna flag "scaricato" per i contatti reali
-      if (dataToExport.length > 0) {
-        // Filtra il contatto di esempio
-        const realContacts = dataToExport.filter(contact => contact.id !== "sample-1");
-        
-        if (realContacts.length > 0) {
-          const idsToUpdate = realContacts.map(contact => contact.id);
-          
-          const { error } = await supabase
-            .from('contatti_clienti')
-            .update({ scaricato: true })
-            .in('id', idsToUpdate);
-
-          if (error) {
-            console.error("Errore nell'aggiornamento del flag scaricato:", error);
-          } else {
-            // Aggiorna anche i contatti visualizzati
-            setContacts(contacts.map(contact => 
-              idsToUpdate.includes(contact.id) ? {...contact, scaricato: true} : contact
-            ));
-            
-            toast.success(`${idsToUpdate.length} contatti marcati come 'scaricati'`);
-          }
-        } else {
-          toast.info("Contatto demo scaricato (nessun aggiornamento nel database)");
-        }
-      }
-    } catch (error) {
-      console.error("Errore durante l'esportazione:", error);
-      toast.error("Si è verificato un errore durante l'esportazione");
     }
   };
 
@@ -422,252 +173,57 @@ const ContactsTable = () => {
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center">
-            <Loader2 className="h-10 w-10 text-gdwater-blue animate-spin mx-auto mb-4" />
-            <p className="text-gdwater-darkgray">Caricamento dati...</p>
-          </div>
+          <LoadingState />
         ) : contacts.length === 0 ? (
-          <div className="py-16 text-center">
-            <p className="text-gdwater-darkgray">Nessun contatto trovato</p>
-          </div>
+          <EmptyState />
         ) : (
           <>
-            <div className="p-4 border-b border-gray-200 flex flex-wrap gap-2 justify-between items-center">
-              <div>
-                <span className="text-sm text-gdwater-darkgray">
-                  {selectedContacts.length} di {total} contatti selezionati
-                </span>
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => downloadCSV(true)}
-                  disabled={selectedContacts.length === 0}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Scarica selezionati
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => downloadCSV(false)}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Scarica tutti
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={handleDeleteSelected}
-                  disabled={selectedContacts.length === 0}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Elimina selezionati
-                </Button>
-              </div>
-            </div>
+            <TableActions 
+              selectedCount={selectedContacts.length}
+              totalCount={total}
+              onDownloadSelected={() => handleDownload(true)}
+              onDownloadAll={() => handleDownload(false)}
+              onDeleteSelected={() => {
+                handleDeleteSelected(selectedContacts);
+                setSelectedContacts([]);
+              }}
+            />
 
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">
-                      <Input
-                        type="checkbox"
-                        checked={selectedContacts.length === contacts.length && contacts.length > 0}
-                        onChange={handleSelectAll}
-                        className="w-4 h-4"
-                      />
-                    </TableHead>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Contatto</TableHead>
-                    <TableHead>Località</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Scaricato</TableHead>
-                    <TableHead>Azioni</TableHead>
-                  </TableRow>
-                </TableHeader>
+                <ContactsTableHeader 
+                  onSelectAll={handleSelectAll}
+                  allSelected={selectedContacts.length === contacts.length && contacts.length > 0}
+                  hasContacts={contacts.length > 0}
+                />
+                
                 <TableBody>
                   {contacts.map(contact => (
-                    <TableRow key={contact.id} className={selectedContacts.includes(contact.id) ? "bg-blue-50" : ""}>
-                      <TableCell>
-                        <Input
-                          type="checkbox"
-                          checked={selectedContacts.includes(contact.id)}
-                          onChange={() => handleSelectContact(contact.id)}
-                          className="w-4 h-4"
-                        />
-                      </TableCell>
-
-                      {editingContact && editingContact.id === contact.id ? (
-                        // Modalità edit
-                        <>
-                          <TableCell>
-                            <Input
-                              name="nome"
-                              value={editFormData.nome || ""}
-                              onChange={handleEditChange}
-                              className="w-full"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Phone className="h-4 w-4 text-gray-400" />
-                                <Input
-                                  name="cellulare"
-                                  value={editFormData.cellulare || ""}
-                                  onChange={handleEditChange}
-                                  className="w-full"
-                                />
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Mail className="h-4 w-4 text-gray-400" />
-                                <Input
-                                  name="email"
-                                  value={editFormData.email || ""}
-                                  onChange={handleEditChange}
-                                  className="w-full"
-                                />
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4 text-gray-400" />
-                              <Input
-                                name="localita"
-                                value={editFormData.localita || ""}
-                                onChange={handleEditChange}
-                                className="w-full"
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell>{formatDate(contact.created_at)}</TableCell>
-                          <TableCell>
-                            {contact.scaricato ? (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                <Check className="h-3 w-3 mr-1" /> Sì
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                <X className="h-3 w-3 mr-1" /> No
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={handleSaveEdit}
-                                className="text-green-600 hover:text-green-800 hover:bg-green-50"
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={handleCancelEdit}
-                                className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </>
-                      ) : (
-                        // Modalità visualizzazione
-                        <>
-                          <TableCell>{contact.nome}</TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="flex items-center">
-                                <Phone className="h-4 w-4 text-gdwater-blue mr-2" />
-                                <span className="text-sm">{contact.cellulare}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Mail className="h-4 w-4 text-gdwater-blue mr-2" />
-                                <span className="text-sm">{contact.email}</span>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <MapPin className="h-4 w-4 text-gdwater-blue mr-2" />
-                              <span>{contact.localita || "-"}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>{formatDate(contact.created_at)}</TableCell>
-                          <TableCell>
-                            {contact.scaricato ? (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                <Check className="h-3 w-3 mr-1" /> Sì
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                <X className="h-3 w-3 mr-1" /> No
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => handleEditClick(contact)}
-                                className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => handleDelete(contact.id)}
-                                className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </>
-                      )}
-                    </TableRow>
+                    <ContactTableRow
+                      key={contact.id}
+                      contact={contact}
+                      isSelected={selectedContacts.includes(contact.id)}
+                      isEditing={editingContact?.id === contact.id}
+                      editFormData={editFormData}
+                      onSelect={handleSelectContact}
+                      onEditClick={handleEditClick}
+                      onEditChange={handleEditChange}
+                      onSaveEdit={handleSaveEdit}
+                      onCancelEdit={handleCancelEdit}
+                      onDelete={handleDelete}
+                      formatDate={formatDate}
+                    />
                   ))}
                 </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TableCell colSpan={7}>
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-gdwater-darkgray">
-                          Visualizzando {contacts.length} di {total} risultati
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPage(Math.max(0, page - 1))}
-                            disabled={page === 0}
-                          >
-                            Precedente
-                          </Button>
-                          <span className="text-sm">
-                            Pagina {page + 1} di {Math.max(1, Math.ceil(total / perPage))}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPage(page + 1)}
-                            disabled={(page + 1) * perPage >= total}
-                          >
-                            Successiva
-                          </Button>
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
+
+                <TablePagination
+                  currentPage={page}
+                  perPage={perPage}
+                  totalItems={total}
+                  visibleItems={contacts.length}
+                  onPrevious={() => setPage(Math.max(0, page - 1))}
+                  onNext={() => setPage(page + 1)}
+                />
               </Table>
             </div>
           </>
